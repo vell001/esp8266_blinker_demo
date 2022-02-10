@@ -10,8 +10,8 @@
 #define OPEN_BTN_PIN D0
 #define STOP_BTN_PIN D1
 #define CLOSE_BTN_PIN D2
-#define BTN_ON_VALUE HIGH
-#define BTN_OFF_VALUE LOW
+#define BTN_ON_VALUE LOW
+#define BTN_OFF_VALUE HIGH
 
 char auth[] = "b25ce3128acc";
 
@@ -20,7 +20,7 @@ BlinkerButton Button1("btn1");//你的按钮名称
 
 
 // 开关进度
-unsigned long fullProcessTime = 30000; // 全部进度需要多长时间
+unsigned long fullProcessTime = 20000; // 全部进度需要多长时间
 int curProcess = 0;
 int targetProcess = 0;
 unsigned long updateProcessTime = 0;
@@ -97,17 +97,17 @@ void doAction() {
         return;
     }
     int deltaProcess = targetProcess - curProcess;
-    unsigned long needTime = abs(deltaProcess) / 100 * fullProcessTime;
-
-    BLINKER_LOG("curProcess: ", curProcess, " targetProcess: ", targetProcess, " needTime: ", needTime);
-    if (deltaProcess > 0) {
-        clickBtn(OPEN_BTN_PIN);
-    } else {
-        clickBtn(CLOSE_BTN_PIN);
+    if (deltaProcess != 0) {
+        auto needTime = (unsigned long) (((float) abs(deltaProcess) / 100.0) * fullProcessTime);
+        BLINKER_LOG("curProcess: ", curProcess, " targetProcess: ", targetProcess, " needTime: ", needTime);
+        if (deltaProcess > 0) {
+            clickBtn(OPEN_BTN_PIN);
+        } else {
+            clickBtn(CLOSE_BTN_PIN);
+        }
+        delay(needTime);
+        clickBtn(STOP_BTN_PIN);
     }
-    delay(needTime);
-    clickBtn(STOP_BTN_PIN);
-
     curProcess = targetProcess;
     updateProcessTime = 0;
     BLINKER_LOG("finish, curProcess: ", curProcess);
